@@ -10,11 +10,13 @@ import java.util.LinkedList;
 
 public class Chess {
 
-    final LinkedList<Piece> pieces = new LinkedList<>();
-    final Image[] imgs = new Image[12];
-    static final Chess GAME = new Chess();
+    public static final LinkedList<Piece> pieces = new LinkedList<>();
+    public static final Chess GAME = new Chess();
+    public static Piece SELECTED_PIECE = null;
+    public static Frame FRAME;
+    public final Image[] imgs = new Image[12];
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         GAME.start();
     }
 
@@ -26,6 +28,15 @@ public class Chess {
         } catch (Exception e) {
             System.out.println("Fail to run the game! \n Cause: " + e.getMessage());
         }
+    }
+
+    public static Piece getPiece(int x, int y) {
+        int xp = x / 64;
+        int yp = y / 64;
+        return pieces.stream()
+                .filter(p -> p.xp == xp && p.yp == yp)
+                .findFirst()
+                .orElse(null);
     }
 
     private void loadImages() throws IOException {
@@ -40,11 +51,11 @@ public class Chess {
     }
 
     private void initializeFrame() {
-        JFrame frame = new JFrame("Chess");
-        frame.setBounds(10, 10, 512, 549);
-//        frame.setUndecorated(true);
-        frame.setResizable(false);
-        frame.setLocationRelativeTo(null);
+        FRAME = new JFrame("Chess");
+        FRAME.setBounds(10, 10, 512, 512);
+        FRAME.setUndecorated(true);
+        FRAME.setResizable(false);
+        FRAME.setLocationRelativeTo(null);
 
         JPanel panel = new JPanel() {
             @Override
@@ -65,9 +76,11 @@ public class Chess {
                 drawPieces(g, this);
             }
         };
-        frame.add(panel);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        FRAME.add(panel);
+        FRAME.setVisible(true);
+        FRAME.addMouseListener(new CustomListeners());
+        FRAME.addMouseMotionListener(new CustomListeners());
+        FRAME.addKeyListener(new CustomListeners());
     }
 
     private void setupPieces() {

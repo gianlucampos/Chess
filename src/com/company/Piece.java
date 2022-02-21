@@ -8,8 +8,7 @@ public class Piece {
         PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING
     }
 
-    int xp;
-    int yp;
+    int x, y, xp, yp;
     boolean isWhite;
     Name nameEnum;
     LinkedList<Piece> ps;
@@ -17,6 +16,8 @@ public class Piece {
     public Piece(int xp, int yp, boolean isWhite, Name nameEnum, LinkedList<Piece> ps) {
         this.xp = xp;
         this.yp = yp;
+        x = xp * 64;
+        y = yp * 64;
         this.isWhite = isWhite;
         this.ps = ps;
         this.nameEnum = nameEnum;
@@ -24,7 +25,16 @@ public class Piece {
     }
 
     public void move(int xp, int yp) {
-        ps.stream().filter(p -> p.xp == xp && p.yp == yp).forEachOrdered(p -> capture());
+        Piece piece = Chess.getPiece(xp * 64, yp * 64);
+        if (piece != null) {
+            if (!piece.isWhite) {
+                piece.capture();
+            } else {
+                x = this.xp * 64;
+                y = this.yp * 64;
+                return;
+            }
+        }
         this.xp = xp;
         this.yp = yp;
     }
@@ -33,13 +43,12 @@ public class Piece {
         ps.remove(this);
     }
 
-
     @Override
     public String toString() {
         return "Piece{" +
                 "xp=" + xp +
                 ", yp=" + yp +
-                ", isWhite=" + isWhite +
+                ", color=" + (isWhite ? "White" : "Black") +
                 ", nameEnum=" + nameEnum +
                 '}';
     }
